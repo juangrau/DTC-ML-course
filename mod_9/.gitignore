@@ -1,3 +1,5 @@
 *.tflite
 
 *.keras
+
+commands_to_remember.md/
