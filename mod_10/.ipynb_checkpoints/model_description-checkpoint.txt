@@ -1,0 +1,81 @@
+
+MetaGraphDef with tag-set: 'serve' contains the following SignatureDefs:
+
+signature_def['__saved_model_init_op']:
+  The given SavedModel SignatureDef contains the following input(s):
+  The given SavedModel SignatureDef contains the following output(s):
+    outputs['__saved_model_init_op'] tensor_info:
+        dtype: DT_INVALID
+        shape: unknown_rank
+        name: NoOp
+  Method name is: 
+
+signature_def['serving_default']:
+  The given SavedModel SignatureDef contains the following input(s):
+    inputs['inputs'] tensor_info:
+        dtype: DT_FLOAT
+        shape: (-1, 150, 150, 3)
+        name: serving_default_inputs:0
+  The given SavedModel SignatureDef contains the following output(s):
+    outputs['output_0'] tensor_info:
+        dtype: DT_FLOAT
+        shape: (-1, 10)
+        name: StatefulPartitionedCall:0
+  Method name is: tensorflow/serving/predict
+The MetaGraph with tag set ['serve'] contains the following ops: {'NoOp', 'VarIsInitializedOp', 'Placeholder', 'AssignVariableOp', 'MergeV2Checkpoints', 'ShardedFilename', 'Pack', 'StringJoin', 'Select', 'SaveV2', 'AddV2', 'Relu', 'MaxPool', 'Identity', 'Const', 'Conv2D', 'MatMul', 'Softmax', 'Reshape', 'ReadVariableOp', 'VarHandleOp', 'StaticRegexFullMatch', 'DisableCopyOnRead', 'StatefulPartitionedCall', 'RestoreV2'}
+
+Concrete Functions:
+  Function Name: '_default_save_signature'
+    Option #1
+      Callable with:
+        Argument #1
+          inputs: TensorSpec(shape=(None, 150, 150, 3), dtype=tf.float32, name='inputs')
+
+
+
+*********************************************************
+***** FROM THIS BLOCK WE TAKE THE FOLLOWING VALUES ******
+*********************************************************
+
+signature_def['serving_default']:
+  The given SavedModel SignatureDef contains the following input(s):
+    inputs['inputs'] tensor_info:
+        dtype: DT_FLOAT
+        shape: (-1, 150, 150, 3)
+        name: serving_default_inputs:0
+  The given SavedModel SignatureDef contains the following output(s):
+    outputs['output_0'] tensor_info:
+        dtype: DT_FLOAT
+        shape: (-1, 10)
+        name: StatefulPartitionedCall:0
+  Method name is: tensorflow/serving/predict
+The MetaGraph with tag set ['serve'] contains the following ops: {'NoOp', 'VarIsInitializedOp', 'Placeholder', 'AssignVariableOp', 'MergeV2Checkpoints', 'ShardedFilename', 'Pack', 'StringJoin', 'Select', 'SaveV2', 'AddV2', 'Relu', 'MaxPool', 'Identity', 'Const', 'Conv2D', 'MatMul', 'Softmax', 'Reshape', 'ReadVariableOp', 'VarHandleOp', 'StaticRegexFullMatch', 'DisableCopyOnRead', 'StatefulPartitionedCall', 'RestoreV2'}
+
+
+*********************************************************
+***** VALUES ******
+*********************************************************
+
+serving_default -> signature name
+inputs  -> Input
+output_0 -> output
+
+
+*********************************************************
+THEN WE EXECUTE THE FOLLOWING COMMAND TO START DOCKER
+IMAGE FOR tensorflow-serving
+
+*********************************************************
+
+docker run -it --rm \
+-p 8500:8500 \
+-v "$(pwd)/terrain_model:/models/terrain_model/1" \
+-e MODEL_NAME="terrain_model" \
+tensorflow/serving:2.7.0
+
+
+docker run -it --rm \
+-p 8500:8500 \
+-v "$(pwd)/terrain_model:/models/terrain_model/1" \
+-e MODEL_NAME="terrain_model" \
+tensorflow/serving:2.11.0

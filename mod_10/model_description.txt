@@ -1,0 +1,174 @@
+# you need to run this:
+
+saved_model_cli show --dir clothing-model --all
+
+# to get this:
+
+MetaGraphDef with tag-set: 'serve' contains the following SignatureDefs:
+
+signature_def['__saved_model_init_op']:
+  The given SavedModel SignatureDef contains the following input(s):
+  The given SavedModel SignatureDef contains the following output(s):
+    outputs['__saved_model_init_op'] tensor_info:
+        dtype: DT_INVALID
+        shape: unknown_rank
+        name: NoOp
+  Method name is: 
+
+signature_def['serving_default']:
+  The given SavedModel SignatureDef contains the following input(s):
+    inputs['inputs'] tensor_info:
+        dtype: DT_FLOAT
+        shape: (-1, 150, 150, 3)
+        name: serving_default_inputs:0
+  The given SavedModel SignatureDef contains the following output(s):
+    outputs['output_0'] tensor_info:
+        dtype: DT_FLOAT
+        shape: (-1, 10)
+        name: StatefulPartitionedCall:0
+  Method name is: tensorflow/serving/predict
+The MetaGraph with tag set ['serve'] contains the following ops: {'NoOp', 'VarIsInitializedOp', 'Placeholder', 'AssignVariableOp', 'MergeV2Checkpoints', 'ShardedFilename', 'Pack', 'StringJoin', 'Select', 'SaveV2', 'AddV2', 'Relu', 'MaxPool', 'Identity', 'Const', 'Conv2D', 'MatMul', 'Softmax', 'Reshape', 'ReadVariableOp', 'VarHandleOp', 'StaticRegexFullMatch', 'DisableCopyOnRead', 'StatefulPartitionedCall', 'RestoreV2'}
+
+Concrete Functions:
+  Function Name: '_default_save_signature'
+    Option #1
+      Callable with:
+        Argument #1
+          inputs: TensorSpec(shape=(None, 150, 150, 3), dtype=tf.float32, name='inputs')
+
+
+
+*********************************************************
+***** FROM THIS BLOCK WE TAKE THE FOLLOWING VALUES ******
+*********************************************************
+
+signature_def['serving_default']:
+  The given SavedModel SignatureDef contains the following input(s):
+    inputs['inputs'] tensor_info:
+        dtype: DT_FLOAT
+        shape: (-1, 150, 150, 3)
+        name: serving_default_inputs:0
+  The given SavedModel SignatureDef contains the following output(s):
+    outputs['output_0'] tensor_info:
+        dtype: DT_FLOAT
+        shape: (-1, 10)
+        name: StatefulPartitionedCall:0
+  Method name is: tensorflow/serving/predict
+The MetaGraph with tag set ['serve'] contains the following ops: {'NoOp', 'VarIsInitializedOp', 'Placeholder', 'AssignVariableOp', 'MergeV2Checkpoints', 'ShardedFilename', 'Pack', 'StringJoin', 'Select', 'SaveV2', 'AddV2', 'Relu', 'MaxPool', 'Identity', 'Const', 'Conv2D', 'MatMul', 'Softmax', 'Reshape', 'ReadVariableOp', 'VarHandleOp', 'StaticRegexFullMatch', 'DisableCopyOnRead', 'StatefulPartitionedCall', 'RestoreV2'}
+
+
+*********************************************************
+***** VALUES ******
+*********************************************************
+
+serving_default -> signature name
+inputs  -> Input
+output_0 -> output
+
+
+*********************************************************
+THEN WE EXECUTE THE FOLLOWING COMMAND TO START DOCKER
+IMAGE FOR tensorflow-serving
+
+*********************************************************
+
+docker run -it --rm \
+-p 8500:8500 \
+-v "$(pwd)/terrain_model:/models/terrain_model/1" \
+-e MODEL_NAME="terrain_model" \
+tensorflow/serving:2.7.0
+
+
+docker run -it --rm \
+-p 8500:8500 \
+-v "$(pwd)/terrain_model:/models/terrain_model/1" \
+-e MODEL_NAME="terrain_model" \
+tensorflow/serving:2.17.0
+
+
+docker run -it --rm \
+-p 8500:8500 \
+-v "$(pwd)/terrainmodel/:/models/terrainmodel/1/" \
+-e MODEL_NAME="terrainmodel" \
+tensorflow/serving:2.10.0
+
+
+
+*********************************************************
+THIS IS THE DOCKER COMMAND TO BUILD THE DOCKER IMAGE 
+OF THE IMAGE MODEL
+*********************************************************
+
+docker build -t zoomcamp-10-model:resnet -f image-model.dockerfile .
+
+*********************************************************
+AND THIS IS HOW YOU RUN it
+*********************************************************
+
+docker run -it --rm \
+-p 8500:8500 \
+zoomcamp-10-model:resnet
+
+*********************************************************
+The we created a new dockerfile for the gateway and
+build it this way
+*********************************************************
+
+docker build -t zoomcamp-10-gateway:002 -f image-gateway.dockerfile .
+
+*********************************************************
+AND THIS IS HOW YOU RUN it
+*********************************************************
+
+docker run -it --rm \
+-p 9696:9696 \
+zoomcamp-10-gateway:002
+
+*********************************************************
+KUBERNETES COMMANDS FOR SMALL CLUSTER
+*********************************************************
+
+kind create cluster
+
+kubectl cluster-info --context kind-kind  => to verify the cluster
+
+kubectl get service
+kubectl get pod
+kubectl get deployment
+
+kubectl apply -f deployment.yaml
+
+kind load docker-image ping:v001
+kubectl port-forward
+
+kubectl apply -f service.yaml
+kubectl port-forward service/ping 8080:80
+
+*********************************************************
+KUBERNETES COMMANDS FOR TF SERVING 
+
+- Create tf model serving yaml files for deployment and service
+- Create gateway yaml files for deployment and service
+- load images to the cluster
+- kubectl apply all yaml files
+*********************************************************
+
+kind load docker-image zoomcamp-10-model:resnet
+kind load docker-image zoomcamp-10-gateway:002
+
+kubectl apply -f model-deployment.yaml
+kubectl apply -f model-service.yaml
+kubectl apply -f gateway-deployment.yaml
+kubectl apply -f gateway-service.yaml
+
+*********************************************************
+TO STOP KUBERNETES CLUSTER
+*********************************************************
+
+docker stop kind-control-plane
+
+*********************************************************
+TO START THE KUBERNETES CLUSTER
+*********************************************************
+
+docker start kind-control-plane
